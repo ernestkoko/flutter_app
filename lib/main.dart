@@ -11,6 +11,9 @@ class MyApp extends StatelessWidget {
     //final wordPair = WordPair.random(); // this generates random words
     return MaterialApp(
       title: 'Startup Name Generator',
+      theme: ThemeData(
+        primaryColor: Colors.white,
+      ),
       home: RandomWords(),
     );
   }
@@ -19,6 +22,37 @@ class RandomWordsState extends State<RandomWords> {
   final List<WordPair> _suggestions = <WordPair>[];
   final Set<WordPair> _saved = Set<WordPair>();
   final TextStyle _biggerFont  = const TextStyle(fontSize: 18);
+
+  void _pushSaved(){
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context){
+          final Iterable<ListTile> tiles = _saved.map(
+              (WordPair pair) {
+                return ListTile(
+                  title: Text(
+                    pair.asPascalCase,
+                    style: _biggerFont,
+                  ),
+                );
+              },
+          ) ;
+        final List<Widget> divided = ListTile
+          .divideTiles(
+          context: context,
+              tiles: tiles,
+        )
+          .toList();
+        return Scaffold(
+          appBar: AppBar(
+            title: Text('Saved Suggestions'),
+          ),
+          body: ListView(children: divided),
+        );
+        },
+      ),
+    );
+  }
 
   Widget _buildRow(WordPair pair) {
     final bool alreadySaved = _saved.contains(pair);
@@ -84,6 +118,9 @@ class RandomWordsState extends State<RandomWords> {
     return Scaffold (
       appBar: AppBar(
         title: Text ('Startup Name Generator'),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.list), onPressed: _pushSaved),
+        ],
       ),
       body: _buildSuggestions(),
     );
